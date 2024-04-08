@@ -1,9 +1,7 @@
-from DatabaseConnection import DatabaseConnection
-from DataManipulation import DataManipulation
-from DataAnalyzer import DataAnalyzer
+from db.Database import Database
 import os
 from dotenv import load_dotenv
-
+from readers import read_csv, read_json
 load_dotenv()
 host = os.getenv('HOST')
 user = os.getenv('USER')
@@ -11,10 +9,8 @@ password = os.getenv('PASSWORD')
 database = os.getenv('DATABASE')
 
 
-#TODO add .env - load variables from dotenv. read about pydantic settings
-con = DatabaseConnection(host, user, password, database)
-
 #TODO усе квері храні в отдельном файліке .json .yml .sql .py 
+
 queryStudents = """CREATE TABLE IF NOT EXISTS students (
                   birthday VARCHAR(255), 
                   id INT PRIMARY KEY,
@@ -27,32 +23,29 @@ queryRooms = """CREATE TABLE IF NOT EXISTS rooms (
               name VARCHAR(255))"""
 
               
-con.execute_query(queryStudents)
-con.execute_query(queryRooms)
+# con.cur.execute(queryStudents)
+# con.cur.execute(queryRooms)
 
-data = DataManipulation(con)
-data.load_data_from_file('rooms.json', 'rooms')
-data.load_data_from_file('students.json', 'students')
+# con.insert('rooms', read_json('json/rooms.json'))
+# con.insert('students', read_json('json/students.json'))
 
-analysis = DataAnalyzer(con)
-analysis.get_rooms('rooms_q1.json')
+#TODO create con, prepare db, read data from file, insert data, execute queries, save results
 
-analysis.get_yungest_rooms('yungest_rooms.json')
-analysis.get_rooms_with_different_sex('sex_diff_rooms.json')
-analysis.get_rooms_with_biggest_age_difference('age_diff_rooms.json')
+def create_con():
+    con = Database(host, user, password, database)
+    return con
 
-# create con, prepare db, read data from file, insert data, execute queries, save results
+def prepare_db(con):
+    con.cur.execute(queryStudents)
+    con.cur.execute(queryRooms)
+    con.insert('rooms', read_json('json/rooms.json'))
+    con.insert('students', read_json('json/students.json'))
 
-# def create_con():
-#     pass
+def run():
+    con = create_con()
+    prepare_db(con)
+    return con
 
-# def prepare_db():
-#     pass
+if __name__ == "__main__":
+    run()
 
-# def run():
-#     create_con()
-#     prepare_db()
-#     pass
-
-# if __name__ == "__main__":
-#     run()

@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS rooms (
+    id INT PRIMARY KEY,
+    name VARCHAR(255)
+)
