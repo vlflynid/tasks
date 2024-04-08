@@ -1,7 +1,7 @@
 import DatabaseConnection
 import json
 
-class DataLoader:
+class DataManipulation:
     def __init__(self, connection: DatabaseConnection):
         self.connection = connection
 
@@ -22,5 +22,13 @@ class DataLoader:
             print(f"File not found: {file_path}")
         except json.JSONDecodeError as e:
             print(f"Error decoding JSON in file: {file_path}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+
+    def dump_data_to_file(self, query: str, file_path: str):
+        try:
+            with open(file_path, 'w') as f:
+                json.dump(self.connection.execute_query(query), f, indent=4)
         except Exception as e:
             print(f"An error occurred: {e}")

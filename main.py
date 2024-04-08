@@ -1,6 +1,7 @@
-import DatabaseConnection
-import DataLoader
-import json
+from DatabaseConnection import DatabaseConnection
+from DataManipulation import DataManipulation
+from DataAnalyzer import DataAnalyzer
+
 
 con = DatabaseConnection('localhost', 'root', 'password', 'task1')
 
@@ -20,9 +21,13 @@ con.execute_query(queryStudents)
 
 con.execute_query(queryRooms)
 
-loader = DataLoader(con)
-loader.load_data_from_file('rooms.json', 'rooms')
-loader.load_data_from_file('students.json', 'students')
+data = DataManipulation(con)
+data.load_data_from_file('rooms.json', 'rooms')
+data.load_data_from_file('students.json', 'students')
 
-result = con.execute_query('SELECT * FROM students LIMIT 5')
-print(json.dumps(result, indent=4))
+analysis = DataAnalyzer(con)
+analysis.get_rooms('rooms_q1.json')
+
+analysis.get_yungest_rooms('yungest_rooms.json')
+analysis.get_rooms_with_different_sex('sex_rooms.json')
+analysis.get_rooms_with_biggest_age_difference('age_diff_rooms.json')
