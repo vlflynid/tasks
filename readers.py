@@ -35,3 +35,12 @@ def read_xml(file_path):
     except Exception as e:
         print(f"An error occurred: {e}")
     
+def read_sql(file_path):
+    try:
+        with open(file_path, 'r') as f:
+            query = f.read()
+            return query
+    except FileNotFoundError as e:
+        print(f"File not found: {file_path}")
+    except Exception as e:
+        print(f"An error occurred: {e}")

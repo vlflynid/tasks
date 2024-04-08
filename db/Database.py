@@ -31,10 +31,13 @@ class Database:
         placeholders = ', '.join(['%s'] * len(data[0]))
         query = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
         values = [tuple(item.values()) for item in data]
-        self.cur.executemany(query, values)
-        self.connection.commit()
+        try:
+            self.cur.executemany(query, values)
+            self.connection.commit()
+        except Error as e:
+            print(f"Error inserting data: {e}")
 
-    def getData(self, table: str, query: str) -> dict:
+    def getData(self, query: str) -> dict:
         self.cur.execute(query)
         result = self.cur.fetchall()
         return result
