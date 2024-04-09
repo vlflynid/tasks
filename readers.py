@@ -3,17 +3,17 @@ import csv
 import json
 from xml_to_dict import XMLtoDict
 
-def read_csv(file_path):
+def read_csv(file_path) -> list:
     try:
         with open(file_path, 'r') as f:
-            reader = csv.DictReader(f)
-            return reader
+            data = list(csv.DictReader(f, delimiter=","))
+            return data
     except FileNotFoundError as e:
             print(f"File not found: {file_path}")
     except Exception as e:
             print(f"An error occurred: {e}")
     
-def read_json(file_path):
+def read_json(file_path) -> list:
     try:
         with open(file_path, 'r') as f:
             data = json.loads(f.read())
@@ -25,7 +25,7 @@ def read_json(file_path):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-def read_xml(file_path) -> dict:
+def read_xml(file_path) -> list:
     try:
         parser = XMLtoDict()
         with open(file_path, 'r') as f:
@@ -38,7 +38,7 @@ def read_xml(file_path) -> dict:
     except Exception as e:
         print(f"An error occurred: {e}")
     
-def read_sql(file_path):
+def read_sql(file_path) -> str:
     try:
         with open(file_path, 'r') as f:
             query = f.read()
@@ -50,13 +50,13 @@ def read_sql(file_path):
 
 def read_file(file_path):
 
-    file_format = os.path.splitext(file_path)[1]
+    file_format = os.path.splitext(file_path)[1][1:]
 
     mapping_dict = {
-        '.csv': read_csv,
-        '.json': read_json,
-        '.xml': read_xml,
-        '.sql': read_sql
+        'csv': read_csv,
+        'json': read_json,
+        'xml': read_xml,
+        'sql': read_sql
     }
     return mapping_dict[file_format](file_path)
 

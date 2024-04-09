@@ -26,14 +26,14 @@ def create_con():
 def prepare_db(con: Database):
     con.cur.execute(queryStudents)
     con.cur.execute(queryRooms)
-    con.insert('rooms', read_file('xml/rooms.xml'))
+    con.insert('rooms', read_file('json/rooms.json'))
     con.insert('students', read_file('json/students.json'))
 
 def analyse_data(con: Database):
-    get_rooms(con, 'analysed/q1_result.json')
-    get_yungest_rooms(con, 'analysed/q2_result.json')
-    get_rooms_with_biggest_age_difference(con, 'analysed/q3_result.json')
-    get_rooms_with_different_sex(con, 'analysed/q4_result.json')
+    get_rooms(con, 'q1_result', 'xml')
+    get_yungest_rooms(con, 'q2_result', 'json')
+    get_rooms_with_biggest_age_difference(con, 'q3_result', 'json')
+    get_rooms_with_different_sex(con, 'q4_result', 'csv')
     pass
 
 def run():
