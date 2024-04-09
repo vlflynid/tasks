@@ -26,7 +26,7 @@ class Database:
         result = self.cur.fetchall()
         return result
     
-    def insert(self, table: str, data: dict) -> None:
+    def insert(self, table: str, data: list) -> None:
         columns = ', '.join(data[0].keys())
         placeholders = ', '.join(['%s'] * len(data[0]))
         query = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
