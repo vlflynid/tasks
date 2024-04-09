@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS students;
+
 CREATE TABLE IF NOT EXISTS students (
     birthday VARCHAR(255), 
     id INT PRIMARY KEY,
