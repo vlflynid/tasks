@@ -11,7 +11,6 @@ class Database:
             )
 
             self.cur = self.connection.cursor(dictionary=True)
-
             self.connection.commit()
         #TODO смарі, якщо є помилка, додати логгер. прінт тебе нічо не вернет. 
         except Error as e:
