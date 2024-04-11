@@ -2,8 +2,10 @@ from db.Database import Database
 import os
 from dotenv import load_dotenv
 from readers import read_file
-from db.DataAnalyzer import get_rooms, get_yungest_rooms, get_rooms_with_biggest_age_difference, get_rooms_with_different_sex
+from writers import write_file
+from colorama import init, Fore, Style
 
+init(autoreset=True)
 
 load_dotenv()
 host = os.getenv('HOST')
@@ -11,37 +13,43 @@ user = os.getenv('USER')
 password = os.getenv('PASSWORD')
 database = os.getenv('DATABASE')
 
-
-#TODO усе квері храні в отдельном файліке .json .yml .sql .py 
-#ОНО?
-
 queryStudents = read_file('queries/createStudents.sql')
 queryRooms = read_file('queries/createRooms.sql')
-#TODO create con, prepare db, read data from file, insert data, execute queries, save results
 
 def create_con():
     con = Database(host, user, password, database)
     return con
 
 def prepare_db(con: Database):
+    """
+    A function to prepare the database by executing queries and inserting data.
+    
+    Parameters:
+    - con: Database object to interact with the database.
+    """
     con.cur.execute(queryStudents)
     con.cur.execute(queryRooms)
-    con.insert('rooms', read_file('json/rooms.json'))
-    con.insert('students', read_file('json/students.json'))
+    con.insert('rooms', read_file('source/rooms.json'))
+    con.insert('students', read_file('source/students.json'))
 
-def analyse_data(con: Database):
-    get_rooms(con, 'q1_result', 'xml')
-    get_yungest_rooms(con, 'q2_result', 'json')
-    get_rooms_with_biggest_age_difference(con, 'q3_result', 'json')
-    get_rooms_with_different_sex(con, 'q4_result', 'csv')
-    pass
+def ask_query():
+    query_num = input(Fore.BLUE + 'Enter query number: ' + Style.RESET_ALL)
+    if (os.path.exists(f'queries/Analysis/q{query_num}.sql')):
+        return read_file(f'queries/Analysis/q{query_num}.sql')
+    else:
+        print(Fore.RED + "Query doesn't exist. Try again.")
+        ask_query()
 
 def run():
     con = create_con()
     prepare_db(con)
-    analyse_data(con)
-    return con
+    query = ask_query()
+    format = input(Fore.BLUE + 'Enter format: ' + Style.RESET_ALL)
+    result = con.getData(query)
+    write_file(result, 'result', format)
 
-if __name__ == "__main__":
+def main():
     run()
 
+if __name__ == "__main__":
+    main()
