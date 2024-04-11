@@ -1,4 +1,12 @@
 from mysql.connector import connect, Error
+import logging
+
+logging.basicConfig(
+    filename='app.log',
+    filemode='a',
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 
 class Database:
     def __init__(self, host: str, user: str, password: str, database: str) -> None:
@@ -16,17 +24,17 @@ class Database:
         """
         try:
             self.connection = connect(
-                host = host,
-                user = user,
-                password = password,
-                database = database
+                host=host,
+                user=user,
+                password=password,
+                database=database
             )
 
             self.cur = self.connection.cursor(dictionary=True)
             self.connection.commit()
-        #TODO смарі, якщо є помилка, додати логгер. прінт тебе нічо не вернет. 
         except Error as e:
-            print(e)
+            logging.error(f"Error connecting to the database: {e}")
+            raise e
 
     def __del__(self):
         self.connection.close()
@@ -64,8 +72,9 @@ class Database:
         try:
             self.cur.executemany(query, values)
             self.connection.commit()
+            logging.info(f"Successfully inserted {len(data)} rows into {table}")
         except Error as e:
-            print(f"Error inserting data: {e}")
+            logging.error(f"Error inserting data into {table}: {e}")
 
     def getData(self, query: str) -> dict:
         """

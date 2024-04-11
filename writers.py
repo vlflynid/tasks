@@ -2,22 +2,24 @@ import os
 import json
 import csv
 from dict2xml import dict2xml
+import logging
+
 def write_data_to_json(data: dict, file_path: str):
-        """
-        A function that writes data to a JSON file.
+    """
+    A function that writes data to a JSON file.
 
-        Parameters:
-            data (dict): The data to be written to the JSON file.
-            file_path (str): The file path where the data will be written.
+    Parameters:
+        data (dict): The data to be written to the JSON file.
+        file_path (str): The file path where the data will be written.
 
-        Returns:
-            None
-        """
-        try:
-            with open(file_path, 'w') as f:
-                json.dump(data, f, indent=4)
-        except Exception as e:
-            print(f"An error occurred: {e}")
+    Returns:
+        None
+    """
+    try:
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=4)
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
 
 def write_data_to_xml(data: dict, file_path: str):
     """
@@ -32,9 +34,11 @@ def write_data_to_xml(data: dict, file_path: str):
     """
     try:
         with open(file_path, 'w') as f:
-            f.write(dict2xml(data))
+            xml_data = dict2xml(data)
+            f.write(xml_data)
+            logging.info(f"Successfully wrote XML data to {file_path}")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        logging.error(f"Error writing XML data to {file_path}: {e}")
 
 def write_data_to_csv(data: dict, file_path: str):
     """
@@ -48,13 +52,14 @@ def write_data_to_csv(data: dict, file_path: str):
         None
     """
     try:
-        with open(file_path, 'w') as f:
+        with open(file_path, 'w', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=data[0].keys())
             writer.writeheader()
             for item in data:
                 writer.writerow(item)
+            logging.info(f"Successfully wrote CSV data to {file_path}")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        logging.error(f"Error writing CSV data to {file_path}: {e}")
 
 def write_file(data: str, file_name: str, format: str):
     """
@@ -76,7 +81,15 @@ def write_file(data: str, file_name: str, format: str):
         if not os.path.exists(f"analysed/{format}"):
             os.makedirs(f"analysed/{format}")
         file_path = f"analysed/{format}/{file_name}.{format}"
-        return mapping_dict[format](data, file_path)
+        logging.info(f"Writing {file_name} in {format} format to {file_path}")
+        try:
+            result = mapping_dict[format](data, file_path)
+            logging.info(f"Successfully wrote {file_name} in {format} format to {file_path}")
+            return result
+        except Exception as e:
+            logging.error(f"Error writing {file_name} in {format} format to {file_path}: {e}")
+            raise
     else:
+        logging.error(f"Invalid format: {format}")
         raise ValueError(f"Invalid format: {format}")
 

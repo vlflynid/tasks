@@ -1,6 +1,7 @@
 from db.Database import Database
 import os
 import logging
+import time
 from dotenv import load_dotenv
 from readers import read_file
 from writers import write_file
@@ -55,7 +56,7 @@ def run():
     try:
         write_file(result, 'result', format)
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(Fore.RED + f"An error occurred: {e}")
 
 def main():
     run()
