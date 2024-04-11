@@ -1,9 +1,11 @@
 from db.Database import Database
 import os
+import logging
 from dotenv import load_dotenv
 from readers import read_file
 from writers import write_file
 from colorama import init, Fore, Style
+
 
 init(autoreset=True)
 
@@ -33,6 +35,10 @@ def prepare_db(con: Database):
     con.insert('students', read_file('source/students.json'))
 
 def ask_query():
+    """
+    A function that prompts the user to enter a query number, checks if the corresponding SQL file exists, 
+    and returns the contents of the file if it exists. If the file does not exist, it prompts the user to try again.
+    """
     query_num = input(Fore.BLUE + 'Enter query number: ' + Style.RESET_ALL)
     if (os.path.exists(f'queries/Analysis/q{query_num}.sql')):
         return read_file(f'queries/Analysis/q{query_num}.sql')
@@ -46,7 +52,10 @@ def run():
     query = ask_query()
     format = input(Fore.BLUE + 'Enter format: ' + Style.RESET_ALL)
     result = con.getData(query)
-    write_file(result, 'result', format)
+    try:
+        write_file(result, 'result', format)
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 def main():
     run()

@@ -66,16 +66,17 @@ def write_file(data: str, file_name: str, format: str):
 	Returns:
 	- The result of writing the data to the file in the specified format.
 	"""
-    
     mapping_dict = {
         'json': write_data_to_json,
         'xml': write_data_to_xml,
         'csv': write_data_to_csv
     }
 
-    if not os.path.exists(f"analysed/{format}"):
-        os.makedirs(f"analysed/{format}")
-    file_path = f"analysed/{format}/{file_name}.{format}"
-
-    return mapping_dict[format](data, file_path)
+    if(format in mapping_dict.keys()):
+        if not os.path.exists(f"analysed/{format}"):
+            os.makedirs(f"analysed/{format}")
+        file_path = f"analysed/{format}/{file_name}.{format}"
+        return mapping_dict[format](data, file_path)
+    else:
+        raise ValueError(f"Invalid format: {format}")
 
