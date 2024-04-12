@@ -1,0 +1,7 @@
+colorama==0.4.6
+dict2xml==1.7.5
+mysql-connector==2.2.9
+mysql-connector-python==8.3.0
+python-dotenv==1.0.1
+PyYAML==6.0.1
+xml-to-dict==0.1.6

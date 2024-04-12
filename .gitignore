@@ -1,4 +1,13 @@
 .env
-__pycache__/
 .pyc
-.log
+*.pyc
+*.pyo
+*.so
+*.a
+*.o
+*.swp
+*.swo
+*.log
+*venv
+__pycache__
+

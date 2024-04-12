@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from readers import read_file
 from colorama import init, Fore, Style
 
-
 init(autoreset=True)
 
 load_dotenv()
@@ -19,9 +18,12 @@ def run():
     con.prepare_db('queries/init.yaml')
     con.insert('rooms', read_file('source/rooms.json'))
     con.insert('students', read_file('source/students.json'))
-    con.get_query_results('queries/analysis.yaml', 'csv')
 
-
+    format = input(Fore.CYAN + "Enter format: " + Style.RESET_ALL)
+    try:
+        con.get_query_results('queries/analysis.yaml', format)
+    except Exception as e:
+        print(Fore.RED + f"Error: {e}" + Style.RESET_ALL)
 def main():
     run()
 
