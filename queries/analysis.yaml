@@ -1,0 +1,30 @@
+q1: SELECT rooms.id, COUNT(students.id) AS amount FROM
+    rooms LEFT JOIN students ON students.room = rooms.id GROUP BY rooms.id
+
+q2: SELECT rooms.id
+    FROM rooms INNER JOIN 
+      students ON students.room = rooms.id
+    GROUP BY rooms.id
+    ORDER BY AVG(DATEDIFF(now(), birthday))
+    LIMIT 5
+
+q3: SELECT rooms.id, DATEDIFF(now(), MIN(birthday)) - DATEDIFF(now(), MAX(birthday)) AS max_age_diff
+    FROM rooms JOIN students ON rooms.id = students.room
+    GROUP BY rooms.id
+    HAVING max_age_diff = (
+    SELECT MAX(subquery.max_age_diff) 
+      FROM (
+          SELECT rooms.id, 
+              DATEDIFF(now(), MIN(birthday)) - DATEDIFF(now(), MAX(birthday)) AS max_age_diff
+          FROM rooms
+          JOIN students ON rooms.id = students.room
+          GROUP BY rooms.id
+      ) AS subquery
+    ); 
+
+q4: SELECT rooms.id, 
+      COUNT(CASE WHEN sex='M' THEN 1 ELSE NULL END) AS male_amount, 
+      COUNT(CASE WHEN sex='F' THEN 1 ELSE NULL END) AS female_amount
+    FROM rooms LEFT JOIN students ON students.room = rooms.id
+    GROUP BY rooms.id
+    HAVING male_amount>0 AND female_amount>0;

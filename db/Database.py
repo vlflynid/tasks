@@ -1,9 +1,12 @@
 from mysql.connector import connect, Error
 import logging
 
+from readers import read_file
+from writers import write_file
+
 logging.basicConfig(
     filename='app.log',
-    filemode='a',
+    filemode='w',
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
@@ -31,28 +34,12 @@ class Database:
             )
 
             self.cur = self.connection.cursor(dictionary=True)
-            self.connection.commit()
         except Error as e:
             logging.error(f"Error connecting to the database: {e}")
             raise e
 
     def __del__(self):
         self.connection.close()
-
-
-    def viewAll(self, table: str):
-        """
-        A function that retrieves all rows from a specified table in the database.
-
-        Parameters:
-            table (str): The name of the table from which to retrieve the rows.
-
-        Returns:
-            list: A list of tuples representing the rows retrieved from the table.
-        """
-        self.cur.execute(f"SELECT * FROM {table}")
-        result = self.cur.fetchall()
-        return result
     
     def insert(self, table: str, data: list) -> None:
         """
@@ -76,16 +63,27 @@ class Database:
         except Error as e:
             logging.error(f"Error inserting data into {table}: {e}")
 
-    def getData(self, query: str) -> dict:
+    def get_query_results(self, query_path: str, format) -> None:
+        queries = read_file(query_path)
+        for key in queries:
+            query = queries[key]
+            self.cur.execute(query)
+            write_file(self.cur.fetchall(), key, format)
+    
+    
+    def prepare_db(self, queries_path: str) -> None:
         """
-        A method to execute a query and retrieve the results.
+        A method to prepare the database by executing queries and inserting data.
 
         Parameters:
-            query (str): The SQL query to be executed.
+            queries (list): A list of SQL queries to be executed.
 
         Returns:
-            dict: The results fetched from the database.
+            None
         """
-        self.cur.execute(query)
-        result = self.cur.fetchall()
-        return result
+        queries = read_file(queries_path)
+        for query in queries.values():
+            self.cur.execute(query)
+        self.connection.commit()
+    
+    

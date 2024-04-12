@@ -61,16 +61,19 @@ def write_data_to_csv(data: dict, file_path: str):
     except Exception as e:
         logging.error(f"Error writing CSV data to {file_path}: {e}")
 
-def write_file(data: str, file_name: str, format: str):
+def write_file(data: list, file_name: str, format: str):
     """
-	Write data to a file in the specified format.
-	Parameters:
-	- data (str): The data to write to the file.
-	- file_name (str): The name of the file to write the data to.
-	- format (str): The format in which to write the data (json, xml, csv).
-	Returns:
-	- The result of writing the data to the file in the specified format.
-	"""
+    A function that writes data to a file in the specified format.
+
+    Parameters:
+    - data (list): The data to be written to the file.
+    - file_name (str): The name of the file to write the data to.
+    - format (str): The format in which the data should be written to the file.
+
+    Returns:
+    The result of writing the data to the file.
+    """
+    
     mapping_dict = {
         'json': write_data_to_json,
         'xml': write_data_to_xml,

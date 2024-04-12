@@ -1,6 +1,7 @@
 import os
 import csv
 import json
+import yaml
 from xml_to_dict import XMLtoDict
 
 def read_csv(file_path) -> list:
@@ -75,6 +76,27 @@ def read_sql(file_path) -> str:
     except Exception as e:
         print(f"An error occurred: {e}")
 
+def read_yaml(file_path) -> list:
+    """
+    Read a YAML file and return its contents as a list.
+
+    Parameters:
+    - file_path (str): The path to the YAML file to be read.
+
+    Returns:
+    - list: A list containing the data from the YAML file.
+    """
+    try:
+        with open(file_path, 'r') as f:
+            data = yaml.safe_load(f)
+            return data
+    except FileNotFoundError as e:
+        print(f"File not found: {file_path}")
+    except yaml.YAMLError as e:
+        print(f"Error loading YAML file: {file_path}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 def read_file(file_path):
     """
 	Reads a file based on its format defined by the file path.
@@ -90,7 +112,9 @@ def read_file(file_path):
         'csv': read_csv,
         'json': read_json,
         'xml': read_xml,
-        'sql': read_sql
+        'sql': read_sql,
+        'yaml': read_yaml
     }
     return mapping_dict[file_format](file_path)
+
 
