@@ -115,6 +115,11 @@ def read_file(file_path):
         'sql': read_sql,
         'yaml': read_yaml
     }
-    return mapping_dict[file_format](file_path)
+
+    try:
+        fun = mapping_dict[file_format]
+    except KeyError:
+        raise ValueError(f"Unsupported file format: {file_format}")
+    return fun(file_path)
 
 

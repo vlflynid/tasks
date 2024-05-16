@@ -1,45 +1,120 @@
-from mysql.connector import connect, Error
+import mysql.connector
+from mysql.connector import Error, errors  
 import logging
-
-from readers import read_file
-from writers import write_file
-
-logging.basicConfig(
-    filename='app.log',
-    filemode='w',
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
-
+class MySqlException(Exception):
+    pass
 class Database:
-    def __init__(self, host: str, user: str, password: str, database: str) -> None:
+    def __init__(self, host, user, password, database):
+        self.host = host
+        self.user = user
+        self.password = password
+        self.database = database
+        self.connection = None
+        self.cursor = None
+        
+        logging.basicConfig (
+            filename='database.log',
+            filemode='w',
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s'
+        )
+    
+
+    def close(self):
+        self.connection.close()
+        self.cursor.close()
+
+    def connect(self):
+        try:
+            self.connection = mysql.connector.connect(
+                host=self.host,
+                user=self.user,
+                password=self.password,
+            )
+            self.cursor = self.connection.cursor(dictionary= True)
+            logging.info('Connected to the database')
+        except errors.DatabaseError as e:
+            logging.error(f'Error connecting to database: {str(e)}')
+
+    def prepare_db(self):
+        try:
+            self.connect()
+            self.create_schema()
+            self.select_schema(self.database)
+        except MySqlException as e:
+            logging.error(f'Error preparing database: {str(e)} - {e.args}')
+
+    def create_table(self, table_name, columns):
+        try:
+            query = f"CREATE TABLE IF NOT EXISTS {table_name} ({', '.join(columns)})"
+            self.cursor.execute(query)
+            self.connection.commit()
+        except Error as e:
+            raise MySqlException(f'Error creating table: {str(e)}')
+    
+    def create_schema(self):
         """
-        Initialize the database connection with the given host, user, password, and database.
+        Creates a schema in the MySQL database.
+
+        This function executes a SQL query to create a database schema if it does not already exist. The name of the schema is determined by the value of the `self.database` attribute.
 
         Parameters:
-            host (str): the host name or IP address of the database server.
-            user (str): the username used to authenticate.
-            password (str): the password used to authenticate.
-            database (str): the name of the database to connect to.
+            self (Database): The current instance of the Database class.
+
+        Raises:
+            MySqlException: If there is an error creating the schema. The exception message will include the specific error message.
 
         Returns:
             None
         """
         try:
-            self.connection = connect(
-                host=host,
-                user=user,
-                password=password,
-                database=database
-            )
-
-            self.cur = self.connection.cursor(dictionary=True)
+            query = "CREATE DATABASE IF NOT EXISTS %s" % self.database
+            self.cursor.execute(query)
+            self.connection.commit()
+            logging.info('Schema created successfully')
         except Error as e:
-            logging.error(f"Error connecting to the database: {e}")
-            raise e
+            raise MySqlException(f'Error creating schema: {str(e)}')
 
-    def __del__(self):
-        self.connection.close()
+    def select_schema(self, schema_name):
+        """
+        Selects a schema in the MySQL database.
+
+        Args:
+            schema_name (str): The name of the schema to select.
+
+        Raises:
+            MySqlException: If there is an error selecting the schema.
+
+        Returns:
+            None
+        """
+        try:
+            query = "USE %s" % schema_name
+            self.cursor.execute(query)
+            logging.info('Schema selected successfully')
+        except Error as e:
+            raise MySqlException(f'Error selecting schema: {str(e)}')
+        
+    def get_data(self, query: str):
+        """
+        Executes the given SQL query and returns the result as a list of dictionaries.
+
+        Parameters:
+            query (str): The SQL query to execute.
+
+        Returns:
+            list: A list of dictionaries representing the result of the query. Each dictionary represents a row in the result set, with the keys being the column names and the values being the corresponding values in each row.
+
+        Raises:
+            Error: If an error occurs while executing the query. The error message and arguments are logged.
+        """
+        try:
+            self.cursor.execute(query)
+            return self.cursor.fetchall()
+        except Error as e:
+            logging.error(f"Error executing query: {str(e)} - {e.args}")
+
+
     
     def insert(self, table: str, data: list) -> None:
         """
@@ -57,33 +132,11 @@ class Database:
         query = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
         values = [tuple(item.values()) for item in data]
         try:
-            self.cur.executemany(query, values)
+            self.cursor.executemany(query, values)
             self.connection.commit()
             logging.info(f"Successfully inserted {len(data)} rows into {table}")
         except Error as e:
-            logging.error(f"Error inserting data into {table}: {e}")
+            raise MySqlException(f"Error inserting data into {table}: {str(e)}")
 
-    def get_query_results(self, query_path: str, format) -> None:
-        queries = read_file(query_path)
-        for key in queries:
-            query = queries[key]
-            self.cur.execute(query)
-            write_file(self.cur.fetchall(), key, format)
-    
-    
-    def prepare_db(self, queries_path: str) -> None:
-        """
-        A method to prepare the database by executing queries and inserting data.
-
-        Parameters:
-            queries (list): A list of SQL queries to be executed.
-
-        Returns:
-            None
-        """
-        queries = read_file(queries_path)
-        for query in queries.values():
-            self.cur.execute(query)
-        self.connection.commit()
     
     

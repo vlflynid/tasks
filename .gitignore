@@ -10,4 +10,5 @@
 *.log
 *venv
 __pycache__
+analysed
 

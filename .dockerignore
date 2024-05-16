@@ -1,0 +1,15 @@
+venv
+.log
+docker-compose.yml
+docker-compose.override.yml
+.venv
+test.json
+analysed
+.git
+.gitignore
+.env
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python

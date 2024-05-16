@@ -4,6 +4,9 @@ import csv
 from dict2xml import dict2xml
 import logging
 
+class WritersException(Exception):
+    pass
+
 def write_data_to_json(data: dict, file_path: str):
     """
     A function that writes data to a JSON file.
@@ -19,7 +22,7 @@ def write_data_to_json(data: dict, file_path: str):
         with open(file_path, 'w') as f:
             json.dump(data, f, indent=4)
     except Exception as e:
-        logging.error(f"An error occurred: {e}")
+        raise WritersException(f"Error writing data to {file_path}: {e}")
 
 def write_data_to_xml(data: dict, file_path: str):
     """
@@ -38,7 +41,7 @@ def write_data_to_xml(data: dict, file_path: str):
             f.write(xml_data)
             logging.info(f"Successfully wrote XML data to {file_path}")
     except Exception as e:
-        logging.error(f"Error writing XML data to {file_path}: {e}")
+        raise WritersException(f"Error writing XML data to {file_path}: {e}")
 
 def write_data_to_csv(data: dict, file_path: str):
     """
@@ -59,8 +62,7 @@ def write_data_to_csv(data: dict, file_path: str):
                 writer.writerow(item)
             logging.info(f"Successfully wrote CSV data to {file_path}")
     except Exception as e:
-        logging.error(f"Error writing CSV data to {file_path}: {e}")
-
+        raise WritersException(f"Error writing CSV data to {file_path}: {e}")
 def write_file(data: list, file_name: str, format: str):
     """
     A function that writes data to a file in the specified format.
@@ -90,9 +92,6 @@ def write_file(data: list, file_name: str, format: str):
             logging.info(f"Successfully wrote {file_name} in {format} format to {file_path}")
             return result
         except Exception as e:
-            logging.error(f"Error writing {file_name} in {format} format to {file_path}: {e}")
-            raise
+            raise WritersException(f"Error writing {file_name} in {format} format to {file_path}: {e}")
     else:
-        logging.error(f"Invalid format: {format}")
-        raise ValueError(f"Invalid format: {format}")
-
+        raise WritersException(f"Unsupported format: {format}")
