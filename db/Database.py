@@ -1,6 +1,7 @@
 import mysql.connector
 from mysql.connector import Error, errors  
 import logging
+from config import LOGFILE
 class MySqlException(Exception):
     pass
 class Database:
@@ -13,7 +14,7 @@ class Database:
         self.cursor = None
         
         logging.basicConfig (
-            filename='database.log',
+            filename=LOGFILE,
             filemode='w',
             level=logging.INFO,
             format='%(asctime)s - %(levelname)s - %(message)s'

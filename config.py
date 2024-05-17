@@ -3,10 +3,12 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-HOST = os.getenv('HOST')
-USER = os.getenv('USER')
-PASSWORD = os.getenv('PASSWORD')
-DATABASE = os.getenv('DATABASE')
+HOST = os.environ.get('HOST')
+USER = os.environ.get('USER')
+PASSWORD = os.environ.get('PASSWORD')
+DATABASE = os.environ.get('DATABASE')
+
+LOGFILE = 'logs.log'
 
 STUDENTS = 'source/students.json'
 ROOMS = 'source/rooms.json'

@@ -5,6 +5,17 @@ from writers import write_file
 import logging
 
 def run():
+    """
+    Runs the database preparation and analysis processes.
+
+    This function connects to the database, prepares it by creating necessary tables, inserts data into 'rooms' and 'students' tables, reads analysis queries from a file, gets data based on these queries from the database, and writes the results to separate JSON files.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+    """
     try:
         db = Database(HOST, USER, PASSWORD, DATABASE)
         db.prepare_db()
