@@ -18,8 +18,6 @@ class Database:
             level=logging.INFO,
             format='%(asctime)s - %(levelname)s - %(message)s'
         )
-    
-
     def close(self):
         self.connection.close()
         self.cursor.close()
@@ -41,7 +39,7 @@ class Database:
             self.connect()
             self.create_schema()
             self.select_schema(self.database)
-        except MySqlException as e:
+        except Exception as e:
             logging.error(f'Error preparing database: {str(e)} - {e.args}')
 
     def create_table(self, table_name, columns):
@@ -50,7 +48,7 @@ class Database:
             self.cursor.execute(query)
             self.connection.commit()
         except Error as e:
-            raise MySqlException(f'Error creating table: {str(e)}')
+            raise Exception(f'Error creating table: {table_name}, {str(e)}')
     
     def create_schema(self):
         """
@@ -73,7 +71,7 @@ class Database:
             self.connection.commit()
             logging.info('Schema created successfully')
         except Error as e:
-            raise MySqlException(f'Error creating schema: {str(e)}')
+            raise Exception(f'Error creating schema: {str(e)}')
 
     def select_schema(self, schema_name):
         """
@@ -93,7 +91,7 @@ class Database:
             self.cursor.execute(query)
             logging.info('Schema selected successfully')
         except Error as e:
-            raise MySqlException(f'Error selecting schema: {str(e)}')
+            raise Exception(f'Error selecting schema: {str(e)}')
         
     def get_data(self, query: str):
         """
@@ -127,6 +125,7 @@ class Database:
         Returns:
             None
         """
+      
         columns = ', '.join(data[0].keys())
         placeholders = ', '.join(['%s'] * len(data[0]))
         query = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
@@ -136,7 +135,7 @@ class Database:
             self.connection.commit()
             logging.info(f"Successfully inserted {len(data)} rows into {table}")
         except Error as e:
-            raise MySqlException(f"Error inserting data into {table}: {str(e)}")
+            raise Exception(f"Error inserting data into {table}: {str(e)}")
 
     
     
