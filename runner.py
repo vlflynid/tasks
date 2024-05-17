@@ -16,6 +16,7 @@ def run():
     Returns:
         None
     """
+
     try:
         db = Database(HOST, USER, PASSWORD, DATABASE)
         db.prepare_db()
@@ -27,6 +28,7 @@ def run():
         logging.error(f'Error preparing database: {str(e)}')
     
     try: 
+        #ext = input('Enter file extension: ')
         queries = read_file(ANALYSIS_PATH)
         for name, query in queries.items():
             data = db.get_data(query)

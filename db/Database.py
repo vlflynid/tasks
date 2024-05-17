@@ -14,8 +14,6 @@ class Database:
         self.cursor = None
         
         logging.basicConfig (
-            filename=LOGFILE,
-            filemode='w',
             level=logging.INFO,
             format='%(asctime)s - %(levelname)s - %(message)s'
         )
@@ -24,6 +22,15 @@ class Database:
         self.cursor.close()
 
     def connect(self):
+        """
+        Attempt to establish a connection to the database using the specified host, user, and password.
+        
+        Parameters:
+            self (Database): The current instance of the Database class.
+            
+        Returns:
+            None
+        """
         try:
             self.connection = mysql.connector.connect(
                 host=self.host,
@@ -36,6 +43,18 @@ class Database:
             logging.error(f'Error connecting to database: {str(e)}')
 
     def prepare_db(self):
+        """
+        Prepares the database by connecting, creating the schema, and selecting the schema.
+
+        Parameters:
+            self (Database): The current instance of the Database class.
+
+        Raises:
+            Exception: If an error occurs during the preparation process.
+
+        Returns:
+            None
+        """
         try:
             self.connect()
             self.create_schema()

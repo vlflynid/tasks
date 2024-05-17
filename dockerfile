@@ -10,7 +10,6 @@ WORKDIR /app
 
 COPY .. /app/
 
-EXPOSE 8000
+EXPOSE 5000
 
 ENTRYPOINT [ "python", "main.py" ]
-
